@@ -13,17 +13,6 @@ api = Api(app)
 pool = mp.Pool(processes=mp.cpu_count()-1)
 print('[Classifier] {} - Using {} Core to process emotion classifier'.format(strftime("%Y-%m-%d %H:%M:%S", gmtime()) ,mp.cpu_count()-1))
 
-# data = json.loads(open('input.json').read(), encoding="UTF-8")
-
-# pool = mp.Pool(processes=mp.cpu_count()-1)
-
- # classifier.classifyUsingMatrix(data)
-
- # classifier.classifyUsingMatrixMulti(data)
-
-# api.add_resource(ChuckClassifier, '/chuck/single')
-
-# api.add_resource(ChuckClassifierMulti, '/chuck/couple')
 
 '''
 Handle Multi Message using Multi-process
@@ -33,6 +22,24 @@ def api_message():
     if request.headers['Content-Type'] == 'application/json':
         # print(request.json)
         js = json.dumps(classifier.classifyUsingMatrixMulti(request.json, pool = pool))
+
+        return Response(js, status=200, mimetype='application/json')
+    else:
+        return "415 Unsupported Data Type"
+
+@app.route('/chuck/couple_all', methods = ['POST'])
+def api_all():
+    if request.headers['Content-Type'] == 'application/json':
+        js = json.dumps(classifier.classifyUsingMatrixMulti(request.json, pool = pool, all_content = True))
+
+        return Response(js, status=200, mimetype='application/json')
+    else:
+        return "415 Unsupported Data Type"
+
+@app.route('/emomap/couple', methods = ['POST'])
+def api_emo():
+    if request.headers['Content-Type'] == 'application/json':
+        js = json.dumps(classifier.classifyUsingMatrixMulti(request.json, pool = pool, all_content = True, story=True))
 
         return Response(js, status=200, mimetype='application/json')
     else:

@@ -175,7 +175,10 @@ def evalWithMultiple(post, emotion,emotionModel):
     return finalScore  
 
 
-def evalWithMatrix(post,emotions,patterns,matrix):
+def evalWithMatrix(post_info,emotions,patterns,matrix, all_content = False, story = False):
+
+    post = post_info.get('message')
+
     print('[Classifier] {} - Processing : {}'.format(strftime("%Y-%m-%d %H:%M:%S", gmtime()) ,post))
     '''
     Start to handle emotion classifier
@@ -255,14 +258,29 @@ def evalWithMatrix(post,emotions,patterns,matrix):
     else:
         ambiguous = "False"
 
-    post_emotion = {
-                "message": post,
-                "emotion1": emotion,
-                "emotion2": emotion2,
-                "ambiguous": ambiguous
-              }
-    # print(post_emotion)
-    return post_emotion
+    if all_content:
+        post_info["emotion1"] = emotion
+        post_info["emotion2"] = emotion2
+        post_info["ambiguous"] = ambiguous
+        if story:
+            story_str = post_info.get('story')
+            if story_str.find('at') != -1:
+                try:
+                    location = story_str[story_str.find('at')+3:-1]
+                except:
+                    location = 'NA'
+        else:
+            location = 'NA'
+        post_info["location"] = location
+        return post_info
+    else:
+        post_emotion = {
+            "message": post,
+            "emotion1": emotion,
+            "emotion2": emotion2,
+            "ambiguous": ambiguous
+          }
+        return post_emotion
 
 
 
@@ -278,7 +296,7 @@ Matrix = loadMatrix(matrixPath)
 
 
 
-def classifyUsingMatrixMulti(data, Matrix = Matrix, pool = None):
+def classifyUsingMatrixMulti(data, Matrix = Matrix, pool = None, all_content = False, story = False):
     '''
     Input: 
         posts [JSON]
@@ -313,17 +331,17 @@ def classifyUsingMatrixMulti(data, Matrix = Matrix, pool = None):
           ]
         }
     '''
-
-
     [emotions,patterns,matrix] = Matrix
     emotion_result = {"data":[]}
 
-    multi_res = [pool.apply_async(evalWithMatrix, (post.get('message'),emotions,patterns,matrix,)) for post in data.get('data') if post.get('message')] # for multi processing
-
+    if story:
+        multi_res = [pool.apply_async(evalWithMatrix, (post,emotions,patterns,matrix,all_content,story,)) for post in data.get('data') if post.get('message') and post.get('story')] # for multi processing
+    else:
+        multi_res = [pool.apply_async(evalWithMatrix, (post,emotions,patterns,matrix,all_content,)) for post in data.get('data') if post.get('message')] # for multi processing
+    
     emotion_result['data'] = [res.get(timeout=1) for res in multi_res]
 
     return emotion_result
-
 
 
 def classifyUsingMatrix(data, Matrix = Matrix):
@@ -363,12 +381,14 @@ def classifyUsingMatrix(data, Matrix = Matrix):
     '''
     [emotions,patterns,matrix] = Matrix
     emotion_result = {"data":[]}
-
-    post = data.get('data')[0].get('message')
-    if post:
-        emotion_result['data'] = [evalWithMatrix(post,emotions,patterns,matrix)]
-    else:    
+    try:
+        post = data.get('data')[0].get('message')
+        if post:
+            emotion_result['data'] = [evalWithMatrix(post,emotions,patterns,matrix)]
+        else:    
+            emotion_result['data'] = ['Empty Message']
+    except:
         emotion_result['data'] = ['Empty Message']
+        pass
 
     return emotion_result
-

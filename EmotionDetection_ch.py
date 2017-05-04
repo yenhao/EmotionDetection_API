@@ -1,14 +1,16 @@
 # -*- coding:utf-8 -*-
 import json
 import urllib2
-
+from datetime import datetime
 
 class EmotionDetection(object):
     """docstring for EmotionDetection"""
     def __init__(self):
         super(EmotionDetection, self).__init__()
 
-    __url = 'http://192.168.2.23:5678/chuck/couple'
+    # __url = 'http://0.0.0.0:5678/chuck/couple'
+
+    __url = 'http://0.0.0.0:5678/emomap/couple'
 
     def get_obj(self, texts_list):
         '''
@@ -18,7 +20,7 @@ class EmotionDetection(object):
         # Prepare the query information
         query = {"data":[]}
         for text in texts_list:
-            query["data"].append({"message":text})
+            query["data"].append({"message":text, "datetime": datetime.now().strftime("%Y/%m/%d %H:%M:%S"), "story":"Huang Yen Hao at 清華名人堂."})
 
         req = urllib2.Request(self.__url)
         req.add_header('Content-Type', 'application/json')
@@ -37,8 +39,10 @@ if __name__ == '__main__':
 
     json = em.get_obj(texts_list)
 
+    print(json['data'])
+
     for js_obj in json['data']:
         output_format = '{}\nFirst Emotion : {}\nSecond Emotion : {}\nIs it Ambiguous : {}\n\n'.format(
-            (js_obj.get('message')).encode('utf-8'), js_obj.get('emotion1'), js_obj.get('emotion2'), js_obj.get('ambiguous')
+                (js_obj.get('message')).encode('utf-8'), js_obj.get('emotion1'), js_obj.get('emotion2'), js_obj.get('ambiguous')
             )
         print(output_format)
