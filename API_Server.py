@@ -5,10 +5,13 @@ import classifier
 import json
 from pprint import pprint
 import multiprocessing as mp
+from time import gmtime, strftime
 
 app = Flask(__name__)
 api = Api(app)
 
+pool = mp.Pool(processes=mp.cpu_count()-1)
+print('[Classifier] {} - Using {} Core to process emotion classifier'.format(strftime("%Y-%m-%d %H:%M:%S", gmtime()) ,mp.cpu_count()-1))
 
 # data = json.loads(open('input.json').read(), encoding="UTF-8")
 
@@ -29,7 +32,7 @@ Handle Multi Message using Multi-process
 def api_message():
     if request.headers['Content-Type'] == 'application/json':
         # print(request.json)
-        js = json.dumps(classifier.classifyUsingMatrixMulti(request.json))
+        js = json.dumps(classifier.classifyUsingMatrixMulti(request.json, pool = pool))
 
         return Response(js, status=200, mimetype='application/json')
     else:

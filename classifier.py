@@ -275,10 +275,10 @@ print('[Classifier] {} - Loading Matrix : {}'.format(strftime("%Y-%m-%d %H:%M:%S
 Multi processing needed
 '''
 Matrix = loadMatrix(matrixPath)
-print('[Classifier] {} - Using {} Core to process emotion classifier'.format(strftime("%Y-%m-%d %H:%M:%S", gmtime()) ,mp.cpu_count()-1))
 
 
-def classifyUsingMatrixMulti(data, Matrix = Matrix):
+
+def classifyUsingMatrixMulti(data, Matrix = Matrix, pool = None):
     '''
     Input: 
         posts [JSON]
@@ -314,8 +314,6 @@ def classifyUsingMatrixMulti(data, Matrix = Matrix):
         }
     '''
 
-
-    pool = mp.Pool(processes=mp.cpu_count()-1)
 
     [emotions,patterns,matrix] = Matrix
     emotion_result = {"data":[]}
