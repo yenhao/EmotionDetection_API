@@ -6,6 +6,7 @@ import json
 from pprint import pprint
 import multiprocessing as mp
 from time import gmtime, strftime
+from OpenSSL import SSL
 
 app = Flask(__name__)
 api = Api(app)
@@ -47,8 +48,12 @@ def api_emo():
 
 @app.route('/chuck/test')
 def test():
+    data = {"data" : [{"message": "看不到你的號碼因為我們這樣分析的"},{"message": "好的那歡迎你直到了晚上去體驗看看"}]}
     return json.dumps(classifier.classifyUsingMatrixMulti(data))
 
 if __name__ == '__main__':
     # app.run(debug=True)
+    context = ('ssl.cert', 'ssl.key')
     app.run('0.0.0.0',debug = False, port=5678)
+    # app.run(host='0.0.0.0',port='5678', 
+    #     debug = False, ssl_context=context)

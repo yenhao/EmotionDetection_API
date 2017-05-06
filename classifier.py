@@ -177,7 +177,7 @@ def evalWithMultiple(post, emotion,emotionModel):
 
 def evalWithMatrix(post_info,emotions,patterns,matrix, all_content = False, story = False):
 
-    post = post_info.get('message')
+    post = post_info.get('message').replace('\n',' ')
 
     print('[Classifier] {} - Processing : {}'.format(strftime("%Y-%m-%d %H:%M:%S", gmtime()) ,post))
     '''
@@ -262,15 +262,15 @@ def evalWithMatrix(post_info,emotions,patterns,matrix, all_content = False, stor
         post_info["emotion1"] = emotion
         post_info["emotion2"] = emotion2
         post_info["ambiguous"] = ambiguous
+
+        location = 'NA'
         if story:
             story_str = post_info.get('story')
             if story_str.find('at') != -1:
                 try:
                     location = story_str[story_str.find('at')+3:-1]
                 except:
-                    location = 'NA'
-        else:
-            location = 'NA'
+                    pass
         post_info["location"] = location
         return post_info
     else:

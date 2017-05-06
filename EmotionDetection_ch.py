@@ -10,7 +10,7 @@ class EmotionDetection(object):
 
     # __url = 'http://0.0.0.0:5678/chuck/couple'
 
-    __url = 'http://0.0.0.0:5678/emomap/couple'
+    __url = 'http://140.114.77.18:5678/emomap/couple'
 
     def get_obj(self, texts_list):
         '''
