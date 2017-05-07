@@ -254,9 +254,9 @@ def evalWithMatrix(post_info,emotions,patterns,matrix, all_content = False, stor
     
     #news:88880.0    joy:85079.0 anticipation:70876.0    fear:51043.0    anger:71064.0   surprise:78956.0    trust:76015.0   sadness:63041.0 disgust:61514.0
     if result_dict[emotion] == 0 and result_dict[emotion2] == 0:
-        ambiguous = "True"
+        ambiguous = True
     else:
-        ambiguous = "False"
+        ambiguous = False
 
     if all_content:
         post_info["emotion1"] = emotion
@@ -266,9 +266,10 @@ def evalWithMatrix(post_info,emotions,patterns,matrix, all_content = False, stor
         location = 'NA'
         if story:
             story_str = post_info.get('story')
-            if story_str.find('at') != -1:
+            location_index = story_str.find(' at ')
+            if location_index != -1:
                 try:
-                    location = story_str[story_str.find('at')+3:-1]
+                    location = story_str[location_index+4:-1]
                 except:
                     pass
         post_info["location"] = location
@@ -320,13 +321,13 @@ def classifyUsingMatrixMulti(data, Matrix = Matrix, pool = None, all_content = F
             "message": "抽顯卡做研究 DeepLearning + 黑色沙漠",
             "emotion1": "anger",
             "emotion2": "haha",
-            "ambiguous" "True"
+            "ambiguous" True
           },
           {
             "message": "送趙奕誠出國報conference",
             "emotion1": "Sad",
             "emotion2": "anger",
-            "ambiguous" "False"
+            "ambiguous" False
           }...
           ]
         }
@@ -368,13 +369,13 @@ def classifyUsingMatrix(data, Matrix = Matrix):
             "message": "抽顯卡做研究 DeepLearning + 黑色沙漠",
             "emotion1": "anger",
             "emotion2": "haha",
-            "ambiguous" "True"
+            "ambiguous" True
           },
           {
             "message": "送趙奕誠出國報conference",
             "emotion1": "Sad",
             "emotion2": "anger",
-            "ambiguous" "False"
+            "ambiguous" False
           }...
           ]
         }
